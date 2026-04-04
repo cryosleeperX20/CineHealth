@@ -1,0 +1,46 @@
+{
+  "anxious": [
+    "Comedy",
+    "Animation",
+    "Childrens",
+    "Musical"
+  ],
+  "sad": [
+    "Comedy",
+    "Romance",
+    "Animation"
+  ],
+  "angry": [
+    "Documentary",
+    "Comedy",
+    "Musical"
+  ],
+  "lonely": [
+    "Drama",
+    "Romance",
+    "Comedy"
+  ],
+  "stressed": [
+    "Animation",
+    "Childrens",
+    "Musical",
+    "Comedy"
+  ],
+  "happy": [
+    "Action",
+    "Adventure",
+    "Sci_Fi",
+    "Thriller"
+  ],
+  "neutral": [
+    "Drama",
+    "Mystery",
+    "Thriller"
+  ],
+  "depressed": [
+    "Comedy",
+    "Animation",
+    "Musical",
+    "Childrens"
+  ]
+}
