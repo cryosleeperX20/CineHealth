@@ -11,11 +11,8 @@ function Landing() {
       <div className="blob blob2"></div>
       <div className="blob blob3"></div>
 
-      <nav className="nav">
-        <div className="logo">🎬 CineHealth</div>
-      </nav>
-
       <div className="hero">
+        <p className="hero-eyebrow">CineHealth</p>
         <h1 className="hero-title">
           How are you <span className="italic-pink">feeling</span> today?
         </h1>

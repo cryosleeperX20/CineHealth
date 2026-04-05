@@ -1,6 +1,8 @@
+import { getChatResponse } from '../groq';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getMoviePoster } from '../tmdb';
 import '../styles/Chat.css';
 
 function Chat() {
@@ -14,20 +16,26 @@ function Chat() {
   const [loading, setLoading] = useState(false);
 
   const moodColors = {
-    happy: '#f9c74f',
-    sad: '#4cc9f0',
-    anxious: '#f8961e',
-    angry: '#f94144',
-    neutral: '#90be6d',
-    depressed: '#9b72cf',
-    lonely: '#43aa8b',
-    stressed: '#f3722c'
+    happy: '#f9c74f', sad: '#4cc9f0', anxious: '#f8961e',
+    angry: '#f94144', neutral: '#90be6d', depressed: '#9b72cf',
+    lonely: '#43aa8b', stressed: '#f3722c'
   };
 
   const moodEmojis = {
     happy: '😊', sad: '😢', anxious: '😰',
     angry: '😠', neutral: '😐', depressed: '😔',
     lonely: '🥺', stressed: '😓'
+  };
+
+  const moodMessages = {
+    happy: "You're radiating great energy! Here are some exciting movies to match your vibe 🌟",
+    sad: "I'm sorry you're feeling down. These movies might bring some comfort 💙",
+    anxious: "Take a deep breath. These light-hearted movies can help ease your mind 🌸",
+    angry: "I hear you. Let these movies help you unwind and find calm 🍃",
+    neutral: "Feeling balanced today! Here are some interesting picks for you 🎬",
+    depressed: "You're not alone. These uplifting movies are here for you 💜",
+    lonely: "Let's keep you company! These movies will warm your heart 🤗",
+    stressed: "You deserve a break! These fun movies will help you relax 😌"
   };
 
   const sendMessage = async () => {
@@ -42,24 +50,31 @@ function Chat() {
       const detectedMood = moodRes.data.mood;
       const intensity = moodRes.data.intensity;
       setMood({ label: detectedMood, intensity });
+
       const history = JSON.parse(localStorage.getItem('moodHistory') || '[]');
-history.push({ mood: detectedMood, intensity, text: input, time: new Date().toLocaleTimeString() });
-localStorage.setItem('moodHistory', JSON.stringify(history));
+      history.push({ mood: detectedMood, intensity, text: input, time: new Date().toLocaleTimeString() });
+      localStorage.setItem('moodHistory', JSON.stringify(history));
 
       const recRes = await axios.post('http://localhost:8000/recommend', {
         user_id: 1,
         mood: detectedMood,
         n: 6
       });
-      setMovies(recRes.data.recommendations);
 
-      setMessages(prev => [...prev, {
-        from: 'bot',
-        text: 'I sense you are feeling ' + detectedMood + ' (intensity: ' + intensity + '/10). Here are some movies that might help!'
-      }]);
+      const moviesWithPosters = await Promise.all(
+        recRes.data.recommendations.map(async (movie) => {
+          const poster = await getMoviePoster(movie.title);
+          return { ...movie, poster };
+        })
+      );
+      setMovies(moviesWithPosters);
+
+      const botResponse = await getChatResponse(input, detectedMood, moviesWithPosters);
+      setMessages(prev => [...prev, { from: 'bot', text: botResponse }]);
 
     } catch (err) {
-      setMessages(prev => [...prev, { from: 'bot', text: 'Oops! Make sure the backend is running.' }]);
+      console.error('Error:', err);
+      setMessages(prev => [...prev, { from: 'bot', text: 'Oops! Something went wrong: ' + err.message }]);
     }
     setLoading(false);
   };
@@ -129,7 +144,13 @@ localStorage.setItem('moodHistory', JSON.stringify(history));
             <div className="movie-cards">
               {movies.map((movie, i) => (
                 <div key={i} className="movie-card">
-                  <div className="movie-poster">🎬</div>
+                  <div className="movie-poster">
+                    {movie.poster ? (
+                      <img src={movie.poster} alt={movie.title} />
+                    ) : (
+                      <div className="poster-placeholder">🎬</div>
+                    )}
+                  </div>
                   <div className="movie-title">{movie.title}</div>
                 </div>
               ))}

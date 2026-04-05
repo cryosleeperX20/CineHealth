@@ -66,10 +66,7 @@ body {
 }
 
 .logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #6b3fa0;
+  display: none;
 }
 
 /* Hero */
@@ -82,6 +79,15 @@ body {
   padding: 80px 24px 40px;
   position: relative;
   z-index: 1;
+}
+
+.hero-eyebrow {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #c45c8a;
+  margin-bottom: 12px;
 }
 
 .hero-title {
