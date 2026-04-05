@@ -12,3 +12,6 @@ build/
 
 # Large zip files
 *.zip
+
+.env
+.env.local
